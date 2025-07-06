@@ -1,3 +1,4 @@
+const db  = require('./database/db');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -18,6 +19,25 @@ app.get('/', (req, res) => {
         version: '1.0.0',
         timestamp: new Date().toISOString()
     });
+});
+
+// db test route
+app.get('/test-db', async (req, res) => {
+    try {
+        const result = await db.query('SELECT NOW() as current_time, COUNT(*) as user_count FROM users');
+        res.json({
+            message: "DB connected successfully",
+            current_time: result.rows[0].current_time,
+            user_count: result.rows[0].user_count
+        });
+    }
+    
+    catch (error) {
+        console.error('DB test failed', error);
+        res.status(500).json({
+            error: "DB connection failed"
+        });
+    }
 });
 
 //health check
